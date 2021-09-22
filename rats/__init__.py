@@ -9,6 +9,8 @@ else:
     dfpath = '/feathereddataframes'
     figurepath = '/pickledfigures'
 
-__version__ = '1.0.2.1'
+__version__ = '1.0.3'
 
-import rats.core.rats
+if __name__ == '__main__':
+    import rats.modules.RATS_CONFIG
+    import rats.core.rats

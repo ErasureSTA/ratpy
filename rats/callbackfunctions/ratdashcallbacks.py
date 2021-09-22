@@ -102,7 +102,7 @@ def plotbank(replot, bigpictureclickdata, file, scans, bigpicture):
     if replot is None:
         bp = bigpicture
     else:
-        bp = bigpictureplots.bigpictureplot(df)
+        bp = bigpictureplots.bigpictureplot(df, decimate=True)
 
     s = scopeplots.scopeplot(df, buffer=scans)
     print('plotbank created figures from scratch')

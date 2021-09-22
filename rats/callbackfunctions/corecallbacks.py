@@ -33,9 +33,10 @@ Contents:
 1 - Dropdown population 
     - Generic placeholder generation, fired on server startup
 2 - File upload 
-    - makedataframe() 
+    - No real purpose right now as upload handled by dash_uploader module 
 3 - Data pre-processing 
     - preprocessdata()
+        - Creates dataframes, list of files in session and performs comparison between dataframes
         - compares dataframes and checks for intra and inter file errors
 4 - Figure management
     - clearprogramdata()
