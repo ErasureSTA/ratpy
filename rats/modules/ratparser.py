@@ -4,7 +4,7 @@
 
 from rats.modules.RATS_CONFIG import packet_structure, rats_input
 import pandas as pd
-from scipy import stats
+import numpy as np
 filename = 'gds_000C00_30_14092021_1520.txt'
 series_stream = []
 
@@ -154,10 +154,34 @@ final_frame = final_frame.droplevel(0).reset_index(drop=True)
 
 meandf = final_frame[final_frame['sip'] == 0].groupby(['function_number','llc_trigger_count','rats_capture_enable']).mean()
 meandf.reset_index(inplace=True)
+# actually need to do a groupby, then get mode of each, then map that mode to the original df...
+
+def generate_mode_column(dataframe,columns_to_group = ['function_number','llc_trigger_count','rats_capture_enable'],llc = 'sip'):
+    meandf = dataframe[dataframe[llc]==0].groupby(columns_to_group).mean()
+    meandf = meandf[['function_number', 'rats_capture_enable', 'data']]
+    filterdf = meandf.groupby(['function_number', 'rats_capture_enable']).agg(pd.Series.mode)
+    #
+
+
 print(meandf.head())
-print(meandf.mode().dropna())
-# data_series = final_frame['data'].apply(int, base=16)
-# print(data_series)
-# print(final_frame.head())
+meandf = meandf[['llc_trigger_count','function_number', 'rats_capture_enable', 'data']]
+
+filterdf = meandf.groupby(['function_number', 'rats_capture_enable']).agg(pd.Series.mode)
+filterdf.reset_index(inplace=True)
+print(filterdf.head())
+print(filterdf.loc[(filterdf['function_number'] == 1286) & (filterdf['rats_capture_enable'] == 2), 'data'].tolist()[0])
+print(meandf.function_number.unique())
+print(meandf.rats_capture_enable.unique())
+functions = meandf.function_number.unique()
+edbs = meandf.rats_capture_enable.unique()
+
+final_frame['filter'] = 0
+for i in functions:
+    for j in edbs:
+        final_frame['filter'] = np.where((final_frame['function_number'] == i) & (final_frame['rats_capture_enable'] == j),
+                                    filterdf.loc[(filterdf['function_number'] == i) & (filterdf['rats_capture_enable'] == j), 'data'].tolist()[0],
+                                    final_frame['filter'])
+
+print(final_frame.head())
 
 # TODO: find outliers in dataframe with respect to function number etc...
